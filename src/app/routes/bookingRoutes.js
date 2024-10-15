@@ -2,6 +2,7 @@
 
 const express = require('express');
 const { createBooking, getAllBookings, getBookingsByDate, updateBookingController } = require('../controllers/bookingController');
+const { getBookingsCountByPurpose } = require('../models/bookingModel');
 const verifyToken = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -95,5 +96,16 @@ router.get('/', verifyToken, getAllBookings);
 router.get('/by-date', verifyToken, getBookingsByDate);
 // Update booking route
 router.put('/bookings/:id', updateBookingController);
+
+// Route to get booking counts by purpose
+router.get('/bookings-by-purpose', async (req, res) => {
+    try {
+        const bookingCounts = await getBookingsCountByPurpose();
+        res.status(200).json(bookingCounts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred while retrieving booking counts by purpose.' });
+    }
+});
 
 module.exports = router;

@@ -101,4 +101,19 @@ async function getBookingByDate(date) {
     return bookings;
 }
 
-module.exports = { createBooking, updateBooking, getAllBookings, getBookingByDate };
+async function getBookingsCountByPurpose() {
+    const connection = await connectToDatabase();
+    const [results] = await connection.execute(`
+        SELECT 
+            dp.purpose_name,
+            COUNT(b.booking_id) AS total_bookings
+        FROM bookings b
+        JOIN donations d ON b.donation_id = d.donation_id
+        JOIN donation_purposes dp ON d.purpose_id = dp.purpose_id
+        GROUP BY dp.purpose_name
+    `);
+    await connection.end();
+    return results;
+}
+
+module.exports = { createBooking, updateBooking, getAllBookings, getBookingByDate, getBookingsCountByPurpose };
